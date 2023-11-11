@@ -1,1 +1,1 @@
-# MINs
+# Multistage Interconnection Networks (MINs)
