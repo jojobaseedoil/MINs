@@ -1,0 +1,6 @@
+digraph debug{
+    A->B
+    A->C
+    B->D
+    B->E
+}

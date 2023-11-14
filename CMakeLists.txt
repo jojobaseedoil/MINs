@@ -6,8 +6,27 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(PROJECT_NAME "MINs")
 project(${PROJECT_NAME})
 
+# Find OpenMP package
+find_package(OpenMP REQUIRED)
+
+# Find JSONcpp package
+find_package(PkgConfig REQUIRED)
+pkg_search_module(JSONCPP REQUIRED jsoncpp)
+
+# Add the source files to the executable
 add_executable(
-	${PROJECT_NAME}
-	Source/Main.cpp
-	Source/Network.cpp
+    ${PROJECT_NAME}
+    Source/Main.cpp
+    Source/Components/Graph.cpp
+    Source/Components/Network.cpp
+    Source/Components/Architecture.cpp
 )
+
+# Add OpenMP compiler flags
+target_compile_options(${PROJECT_NAME} PRIVATE ${OpenMP_CXX_FLAGS})
+
+# Link against OpenMP library
+target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenMP_CXX_LIBRARIES})
+
+# Link against JSONcpp library
+target_link_libraries(${PROJECT_NAME} PRIVATE ${JSONCPP_LIBRARIES})

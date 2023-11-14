@@ -1,12 +1,16 @@
 #pragma once
 
 #include <iostream>
+#include <omp.h>
 #define ROUTE_FAILURE (-1)
+
+class Architecture;
+class Edge;
 
 class Network{ /* This is a Multistage Interconnection Network Representation */
 public:	
 	/* CONSTRUCTORS AND DESTRUCTOR */
-	explicit Network(uint size, uint stages, uint extras, uint radix=4);
+	explicit Network(Architecture *owner, uint size, uint stages, uint extras, uint radix=4);
 	Network();
 	~Network();
 
@@ -14,6 +18,7 @@ public:
 	
 	/* Routing methods */
 	int Route(uint input, uint output);
+	int Route(Edge *edge);
 	int Route(int word);
 	int UnRoute(int word);
 
@@ -49,4 +54,5 @@ private:
 	int **mMulticastConfig;
 	uint mSize, mStage, mExtra;
 	uint mRadix, mMask, mExtraPermutations;
+	Architecture *mOwner;
 };

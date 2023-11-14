@@ -1,7 +1,9 @@
 #include "Network.h"
+#include "Architecture.h"
 
 /* CONSTRUCTORS AND DESTRUCTOR */
-Network::Network(uint size, uint stages, uint extras, uint radix):
+Network::Network(Architecture *owner, uint size, uint stages, uint extras, uint radix):
+	mOwner(owner),
 	mSize(size),
 	mStage(stages),
 	mExtra(extras),
@@ -52,6 +54,24 @@ int Network::Route(uint input, uint output){
 		}
 	}
 
+	return ROUTE_FAILURE;
+}
+
+int Network::Route(Edge *edge){
+
+	auto iport = mOwner->GetInput(edge->target->GetId());
+	auto oport = mOwner->GetOutput(edge->source->GetId());
+	
+	/* Test all possible route configs */
+	for(auto input : iport){
+		for(auto output : oport){
+			int word = this->Route(input, output);
+			if(word >= 0){
+				edge->label = word;
+				return word;
+			}
+		}
+	}
 	return ROUTE_FAILURE;
 }
 
@@ -136,6 +156,7 @@ void Network::DestroyNetwork(){
 /* Route specific */
 void Network::InsertPath(int word){
 	/* mark path 'word' as done */
+	#pragma omp parallel for
 	for(int j=0; j<mStage+mExtra; j++){
 		int i = SlideWindow(word, j);
 		mNetwork[i][j]++; // allow multicast by adding +1  
