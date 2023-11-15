@@ -17,9 +17,14 @@ pkg_search_module(JSONCPP REQUIRED jsoncpp)
 add_executable(
     ${PROJECT_NAME}
     Source/Main.cpp
+    # Components
     Source/Components/Graph.cpp
     Source/Components/Network.cpp
     Source/Components/Architecture.cpp
+    # heuristics
+    Source/Heuristics/SimulatedAnnealing.cpp
+    # utils
+    Source/Utils/Random.cpp
 )
 
 # Add OpenMP compiler flags

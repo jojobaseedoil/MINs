@@ -34,11 +34,39 @@ public:
     const std::vector<int> &GetOutput(uint pe) const;
 
     /* Get number of PEs */
-    uint GetSize() const;
+    inline uint GetSize() const{
+        return mPort->pes;
+    }
 
     /* Remove/Add connections */
     int Connect(uint pe);
     int Disconnect(uint pe);
+
+    /* Swap two nodes inside pe0 and pe1 */
+    inline void Swap(uint pe0, uint pe1){
+        if(mPe2Node[pe0] != nullptr) mPe2Node[pe0]->SetPe(pe1);
+        if(mPe2Node[pe1] != nullptr) mPe2Node[pe1]->SetPe(pe0);
+        std::swap(mPe2Node[pe0],mPe2Node[pe1]);
+    }
+    /* undo swap */
+    void GetBackToPreviousState(uint pe0, uint pe1);
+
+    /* Get/Set CGRA solution cost */
+    inline int GetCost() const{
+        return mCost;
+    }
+    inline void SetCost(const int cost){
+        mCost = cost;
+    }
+    /* Get Graph */
+    inline const Graph *GetGraph() const{
+        return mDFG;
+    }
+
+    /* Clear stack */
+    inline void ClearStack(){
+        mStack.clear();
+    }
 
 private:
     /* PRIVATE METHODS */

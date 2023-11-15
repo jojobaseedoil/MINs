@@ -31,17 +31,17 @@ public:
     ~MyStack(){
         delete[] mData;
     }
-    void push(T item){
+    inline void push(T item){
         if(mCursor >= mSize){
             std::cerr << "The maximum stack size has been exceeded.\n";
             exit(EXIT_FAILURE);
         }
         mData[ mCursor++ ] = item;
     }
-    void pop(){ mCursor = ( mCursor==0 ? 0 : mCursor-1 ); }
-    T top() const{ return ( mCursor==0 ? T() : mData[mCursor-1] ); }
-    bool empty() const{ return mCursor==0; }
-    void clear(){ mCursor = 0; }
+    inline void pop(){ mCursor = ( mCursor==0 ? 0 : mCursor-1 ); }
+    inline T top() const{ return ( mCursor==0 ? T() : mData[mCursor-1] ); }
+    inline bool empty() const{ return mCursor==0; }
+    inline void clear(){ mCursor = 0; }
 
 private:
     T *mData;

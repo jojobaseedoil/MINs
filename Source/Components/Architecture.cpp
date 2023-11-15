@@ -5,7 +5,8 @@
 
 /* CONSTRUCTORS AND DESTRUCTOR */
 Architecture::Architecture():
-    mStack(1024)
+    mStack(1024),
+    mCost(0)
 {
     CreateArchitecture();
 }
@@ -30,6 +31,7 @@ bool Architecture::Init(
         return false;
     }
 
+
     /* Set the Data Flow Graph */  
     mDFG = parser::LoadGraph(DotGraph);
     if(mDFG == nullptr){
@@ -40,11 +42,18 @@ bool Architecture::Init(
     /* Set the Multistage Interconnection Network */
     mOmega = new Network(this,N,STAGE,EXTRA);
 
-    /* Init solution as empty */
+    /* Init solution */
     mPe2Node = NodeList(mPort->pes, nullptr);
     int i=0;
     for(auto node : mDFG->GetNodes()){
         mPe2Node[i++] = node;
+    }
+    std::random_shuffle(mPe2Node.begin(), mPe2Node.end());
+    for(int j=0; j<GetSize(); j++){
+        Node *node = mPe2Node[j];
+        if(node != nullptr){
+            node->SetPe(j);
+        }
     }
     
     return true;
@@ -64,20 +73,15 @@ const std::vector<int> &Architecture::GetOutput(uint pe) const{
     return mPort->output[pe];
 }
 
-/* Get number of PEs */
-uint Architecture::GetSize() const{
-    return mPort->pes;
-}
-
 /* Remove/Add connections */
 int Architecture::Connect(uint pe){
-    
-    /* Remove this later... we'll make sure that 
-    only valid pe's enter this function */
-    if(pe >= mPort->pes || mPe2Node[pe] == nullptr){
-        std::cerr << "there is no node to connect at position " << pe << ".\n";
-        exit(EXIT_FAILURE);
+    // std::cout << "connecting node: ";
+    if(mPe2Node[pe] == nullptr){
+        // std::cout << "empty\n";
+        return 0;
     }
+
+    // std::cout << mPe2Node[pe]->GetId() << "\n";
 
     int added = 0;
     Node *node = mPe2Node[pe];
@@ -87,6 +91,7 @@ int Architecture::Connect(uint pe){
         if( edge->label == UNVISITED && mOmega->Route(edge) != ROUTE_FAILURE ){
             int64_t item = edge->label | (static_cast<int64_t>(edge->id) << 24) | 
                                          (static_cast<int64_t>(0) << 32);
+            // std::cout << "\t" << item << " ( " << edge->label << ", " << edge->id << ", " << 0 << " )\n";
             mStack.push(item);
             added++;
         }
@@ -96,12 +101,13 @@ int Architecture::Connect(uint pe){
 }
 
 int Architecture::Disconnect(uint pe){
-    /* Remove this later... we'll make sure that 
-    only valid pe's enter this function */
-    if(pe >= mPort->pes || mPe2Node[pe] == nullptr){
-        std::cerr << "there is no node to connect at position " << pe << ".\n";
-        exit(EXIT_FAILURE);
+    // std::cout << "disconnecting node: ";
+    if(mPe2Node[pe] == nullptr){
+        // std::cout << "empty\n";
+        return 0;
     }
+
+    // std::cout << mPe2Node[pe]->GetId() << "\n";
 
     int removed = 0;
     Node *node = mPe2Node[pe];
@@ -112,6 +118,7 @@ int Architecture::Disconnect(uint pe){
         if(mOmega->UnRoute(word) != ROUTE_FAILURE){
             int64_t item = word | (static_cast<int64_t>(edge->id) << 24) | 
                                   (static_cast<int64_t>(1) << 32);
+            // std::cout << "\t" << item << " ( " << word << ", " << edge->id << ", " << 1 << " )\n";
             edge->label = UNVISITED;
             mStack.push(item);
             removed++;
@@ -119,6 +126,32 @@ int Architecture::Disconnect(uint pe){
     }
 
     return removed;
+}
+
+void Architecture::GetBackToPreviousState(uint pe0, uint pe1){
+
+    while(!mStack.empty()){
+
+        int64_t item = mStack.top();
+        mStack.pop();
+
+        int word = item & 0xFFFFFF;
+        int id   = (item >> 24) & 0xFF;
+        int v    = (item >> 32) & 0x1;
+        Edge *edge = mDFG->GetEdges()[id];
+    
+        if(v){
+            // std::cout << "connnected " << item << "\n";
+            mOmega->Route(word);
+            edge->label = word;
+        } else{
+            // std::cout << "disconnnected " << item << "\n";
+            mOmega->UnRoute(word);
+            edge->label = UNVISITED;
+        }
+    }
+
+    Swap(pe0, pe1);
 }
 
 /* PRIVATE METHODS */

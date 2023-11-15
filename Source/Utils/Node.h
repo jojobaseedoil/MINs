@@ -29,11 +29,12 @@ typedef std::vector<Edge*> EdgeList;
 class Node{
 public:
     Node(int id):
-        mId(id)
+        mId(id),
+        mPe(-1)
     {
         mDegree[0] = mDegree[1] = mDegree[3] = 0;
     }
-    inline void link(Edge *edge){
+    inline void link(Edge *edge){ /* increment node degree here */
         mEdges.emplace_back(edge);
     }
     inline const EdgeList &GetEdges() const{
@@ -41,6 +42,12 @@ public:
     }
     inline uint GetId() const{
         return mId;
+    }
+    inline uint GetPe() const{
+        return mPe;
+    }
+    inline void SetPe(uint pe){
+        mPe = pe;
     }
     inline int GetDegree(uint type=0){
         return mDegree[type];
@@ -50,4 +57,5 @@ private:
     int mDegree[3];
     EdgeList mEdges;
     uint mId;
+    uint mPe;
 };

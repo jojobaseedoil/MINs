@@ -59,8 +59,11 @@ int Network::Route(uint input, uint output){
 
 int Network::Route(Edge *edge){
 
-	auto iport = mOwner->GetInput(edge->target->GetId());
-	auto oport = mOwner->GetOutput(edge->source->GetId());
+	Node *source = edge->source;
+	Node *target = edge->target;
+	
+	auto iport = mOwner->GetInput( target->GetPe() );
+	auto oport = mOwner->GetOutput( source->GetPe() );
 	
 	/* Test all possible route configs */
 	for(auto input : iport){
