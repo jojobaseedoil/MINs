@@ -6,6 +6,7 @@
 struct Config{
     std::vector<std::vector<int>> input;
     std::vector<std::vector<int>> output;
+    std::vector<int> degree;
     uint pes;
 };
 
@@ -58,6 +59,13 @@ public:
     inline void SetCost(const int cost){
         mCost = cost;
     }
+    inline int GetDegree(uint pe) const{
+        return mPort->degree[pe];
+    }
+    inline int GetFitness() const{
+        return mFitness;
+    }
+
     /* Get Graph */
     inline const Graph *GetGraph() const{
         return mDFG;
@@ -81,5 +89,5 @@ private:
     Graph *mDFG;    // data flow graph
     Config *mPort;
     NodeList mPe2Node;
-    int mCost;
+    int mCost, mFitness;
 };

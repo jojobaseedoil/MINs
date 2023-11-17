@@ -76,6 +76,7 @@ namespace parser{
 
         std::vector<std::vector<int>> input(num_pes);
         std::vector<std::vector<int>> output(num_pes);
+        std::vector<int> PeDeg(num_pes);
         
         for (int i = 0; i < num_pes; i++) {
             std::string peName  = "PE"+std::to_string(i);
@@ -86,16 +87,19 @@ namespace parser{
             
             for(int j=0; j<insize; j++){
                 input[i].push_back( pe["input"][j].asInt() );
+                PeDeg[i]++;
             }
 
             for(int j=0; j<outsize; j++){
                 output[i].push_back( pe["output"][j].asInt() );
+                PeDeg[i]++;
             }
         }
 
         Config *port = new Config;
         port->input = input;
         port->output = output;
+        port->degree = PeDeg;
         port->pes = num_pes;
 
         file.close();

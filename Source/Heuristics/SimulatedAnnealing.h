@@ -17,9 +17,12 @@ public:
     /* PUBLIC METHODS */
     int Execute(Architecture *CGRA) override;
     int InitialSolution(Architecture *CGRA) override;
+protected:
+    /* PROTECTED METHODS */
+    int Evaluate(Architecture *CGRA, int cost, uint pe0, uint pe1);
+
 private:
     /* PRIVATE METHODS */
-    int Evaluate(Architecture *CGRA, int cost, uint pe0, uint pe1);
     inline bool StopCriterion() const override{
         return mTemperature < mMinTemperature;
     }

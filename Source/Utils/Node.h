@@ -3,8 +3,6 @@
 #include <vector>
 #include <iostream>
 
-#define IN 1
-#define OUT 2
 #define UNVISITED (-1)
 
 class Node;
@@ -32,9 +30,12 @@ public:
         mId(id),
         mPe(-1)
     {
-        mDegree[0] = mDegree[1] = mDegree[3] = 0;
+        mDegree[0] = 0; // degree
+        mDegree[1] = 0; // in degree
+        mDegree[2] = 0; // out degree
     }
     inline void link(Edge *edge){ /* increment node degree here */
+        mDegree[0]++;        
         mEdges.emplace_back(edge);
     }
     inline const EdgeList &GetEdges() const{
@@ -49,8 +50,14 @@ public:
     inline void SetPe(uint pe){
         mPe = pe;
     }
-    inline int GetDegree(uint type=0){
-        return mDegree[type];
+    inline int GetDegree(){
+        return mDegree[0];
+    }
+    inline int GetInDegree(){
+        return mDegree[1];
+    }
+    inline int GetOutDegree(){
+        return mDegree[2];
     }
 
 private:

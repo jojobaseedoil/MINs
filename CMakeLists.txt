@@ -23,6 +23,7 @@ add_executable(
     Source/Components/Architecture.cpp
     # heuristics
     Source/Heuristics/SimulatedAnnealing.cpp
+    Source/Heuristics/LocalSearch.cpp
     # utils
     Source/Utils/Random.cpp
 )
